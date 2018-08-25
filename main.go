@@ -29,17 +29,34 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 	return block
 }
 
+type Blockchain struct {
+	blocks []*Block
+}
+
+func (bc *Blockchain) AddBlock(data string) {
+	prevBlock := bc.blocks[len(bc.blocks)-1]
+	newBlock := NewBlock(data, prevBlock.Hash)
+	bc.blocks = append(bc.blocks, newBlock)
+}
+
+func NewGenesisBlock() *Block {
+	return NewBlock("Genesis Block", []byte{})
+}
+
+func NewBlockchain() *Blockchain {
+	return &Blockchain{[]*Block{NewGenesisBlock()}}
+}
+
 func main() {
-	block0 := NewBlock("This is the genesis block", []byte{})
-	fmt.Printf("Prev. hash: %x\n", block0.PrevBlockHash)
-	fmt.Printf("Data: %s\n", block0.Data)
-	fmt.Printf("Hash: %x\n", block0.Hash)
-	fmt.Println()
+	bc := NewBlockchain()
 
-	block1 := NewBlock("This is the first block", block0.Hash)
-	fmt.Printf("Prev. hash: %x\n", block1.PrevBlockHash)
-	fmt.Printf("Data: %s\n", block1.Data)
-	fmt.Printf("Hash: %x\n", block1.Hash)
-	fmt.Println()
+	bc.AddBlock("Send 1 BTC to Ivan")
+	bc.AddBlock("Send 2 more BTC to Ivan")
 
+	for _, block := range bc.blocks {
+		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %x\n", block.Hash)
+		fmt.Println()
+	}
 }
